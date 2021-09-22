@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "189617356799",
+    "firebase_url": "https://ultrawavergb-default-rtdb.firebaseio.com",
+    "project_id": "ultrawavergb",
+    "storage_bucket": "ultrawavergb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189617356799:android:c010bdd714c552f70e71ca",
+        "android_client_info": {
+          "package_name": "com.ultrawavergb.dashboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "189617356799-m92dqou01e5tn4rdm8jq3a79dfbdsd5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9CiHp7CD6gHrcNCcZ7piTN5AwYro9Az0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "189617356799-m92dqou01e5tn4rdm8jq3a79dfbdsd5v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
