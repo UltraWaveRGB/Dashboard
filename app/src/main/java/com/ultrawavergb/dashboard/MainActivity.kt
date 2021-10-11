@@ -31,81 +31,85 @@ class MainActivity : AppCompatActivity() {
         val btnStop = findViewById<Button>(R.id.btn_stop_cancel)
 
         val seekBar = findViewById<SeekBar>(R.id.skbar_potencia)
-        val txtPotencia =
-            findViewById<TextView>(R.id.txtview_potencia)  // ? separar em dois text view ?
+
+        database.getReference("power").get().addOnSuccessListener {
+            val intValue = it.value.toString().toInt()
+            seekBar.setProgress(intValue)
+            updateSeekBarPotencia(intValue)
+        }.addOnFailureListener {
+            Log.e("firebase", "Error getting data.", it)
+        }
 
         /* --- FUNCOES DOS WIDGETS --- */
 
         btnPipoca.setOnClickListener {
-            // TODO
+            template(70, 300)
         }
 
         btnLasanha.setOnClickListener {
-            // TODO
+            template(100, 600)
         }
 
         btnBrigadeiro.setOnClickListener {
-            // TODO
+            template(50, 240)
         }
 
         btnVegetais.setOnClickListener {
-            // TODO
+            template(50, 240)
         }
 
         btnArroz.setOnClickListener {
-            // TODO
+            template(90, 540)
         }
 
         btnCarne.setOnClickListener {
-            // TODO
+            template(100, 720)
         }
 
         btnStart.setOnClickListener {
-            val startRef = database.getReference("start")
-            startRef.setValue(1)
+            database.getReference("start").setValue(1)
             Log.d("STATE", "Start set to 1.")
         }
 
         btnStop.setOnClickListener {
-            // TODO
+            handleStop()
         }
-
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, value: Int, p2: Boolean) {
-                txtPotencia.setText("Potencia: $value")
+                updateSeekBarPotencia(value)
             }
 
-            override fun onStartTrackingTouch(p0: SeekBar?) {
-                TODO("Not yet implemented")
-            }
+            override fun onStartTrackingTouch(p0: SeekBar?) {}
 
-            override fun onStopTrackingTouch(p0: SeekBar?) {
-                TODO("Not yet implemented")
-            }
+            override fun onStopTrackingTouch(p0: SeekBar?) {}
 
         })
-
-
     }
 
+    private fun updateSeekBarPotencia(value: Int) {
+        val txtViewPotencia = findViewById<TextView>(R.id.txtview_potencia_value)
+        txtViewPotencia.setText("${value}%")
+    }
 
-//    // TODO: timer
-//    private fun updateTime() {
-//        val refLdr = database.getReference("time")
-//        val textViewTimeValue = findViewById<TextView>(R.id.text_view_time_value)
-//        refLdr.addValueEventListener(object : ValueEventListener {
-//
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                val value = snapshot.getValue<Int>()
-//                Log.d("STATE", "Time Value is: " + value)
-//                textViewTimeValue.text = value.toString()
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.w("ERRO", "Failed to read value.", error.toException())
-//            }
-//        })
-//    }
+    private fun template(newPower: Int, time: Int) {
+        database.getReference("power").setValue(newPower)
+        // ? update da seekbar ?
+        database.getReference("time").setValue(time)
+        database.getReference("start").setValue(1)
+    }
 
+    private fun handleStop() {
+        val stopRef = database.getReference("stop")
+        stopRef.get().addOnSuccessListener {
+            val stop = it.value.toString().toInt()
+            when (stop) {
+                0 -> stopRef.setValue(1)
+                1 -> stopRef.setValue(2)
+                else -> print("Don't change.")
+            }
+        }.addOnFailureListener {
+            Log.e("Firebase", "Error getting data.", it)
+        }
+    }
 }
