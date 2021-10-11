@@ -11,6 +11,9 @@ import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
     private val database = Firebase.database
+    private val STATE_ON = 1
+    private val STATE_OFF = 0
+    private val STATE_PAUSED = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,12 +70,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnStart.setOnClickListener {
-            database.getReference("start").setValue(1)
-            Log.d("STATE", "Start set to 1.")
+            handleState()
         }
 
         btnStop.setOnClickListener {
-            handleStop()
+            handleState()
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -96,20 +98,24 @@ class MainActivity : AppCompatActivity() {
         database.getReference("power").setValue(newPower)
         // ? update da seekbar ?
         database.getReference("time").setValue(time)
-        database.getReference("start").setValue(1)
+        database.getReference("state").setValue(1)
     }
 
-    private fun handleStop() {
-        val stopRef = database.getReference("stop")
-        stopRef.get().addOnSuccessListener {
+    private fun handleState() {
+        val stateRef = database.getReference("state")
+        stateRef.get().addOnSuccessListener {
             val stop = it.value.toString().toInt()
             when (stop) {
-                0 -> stopRef.setValue(1)
-                1 -> stopRef.setValue(2)
-                else -> print("Don't change.")
+                STATE_OFF -> stateRef.setValue(STATE_ON)
+                STATE_ON -> stateRef.setValue(STATE_PAUSED)
+                STATE_PAUSED -> stateRef.setValue(STATE_OFF)
             }
         }.addOnFailureListener {
             Log.e("Firebase", "Error getting data.", it)
         }
+    }
+
+    private fun setTime() {
+        TODO("Precisa implementar")
     }
 }
