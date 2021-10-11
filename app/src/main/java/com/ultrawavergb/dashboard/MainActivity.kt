@@ -89,8 +89,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateSeekBarPotencia(value: Int) {
-        val txtViewPotencia = findViewById<TextView>(R.id.txtview_potencia)
-        txtViewPotencia.setText("Potencia: $value")
+        val txtViewPotencia = findViewById<TextView>(R.id.txtview_potencia_value)
+        txtViewPotencia.setText("${value}%")
     }
 
     private fun template(newPower: Int, time: Int) {
