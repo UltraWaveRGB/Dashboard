@@ -159,7 +159,7 @@
 
     <LinearLayout
         android:id="@+id/start_cancel_linear_layout"
-        android:layout_below="@id/time_power_layout"
+        android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -174,7 +174,7 @@
             android:layout_height="match_parent"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="5dp"
-            android:text="Start" />
+            android:text="Iniciar" />
 
         <Button
             android:id="@+id/btn_stop_cancel"
@@ -183,7 +183,7 @@
             android:layout_height="match_parent"
             android:layout_marginRight="5dp"
             android:layout_marginLeft="5dp"
-            android:text="Stop/Cancel" />
+            android:text="Pausar/Cancelar" />
 
     </LinearLayout>
 
