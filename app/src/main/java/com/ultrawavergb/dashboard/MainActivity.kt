@@ -72,8 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnStop.setOnClickListener {
-            database.getReference("stop").setValue(1)
-            Log.d("STATE", "Stop set to 1.")
+            handleStop()
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -100,4 +99,17 @@ class MainActivity : AppCompatActivity() {
         database.getReference("start").setValue(1)
     }
 
+    private fun handleStop() {
+        val stopRef = database.getReference("stop")
+        stopRef.get().addOnSuccessListener {
+            val stop = it.value.toString().toInt()
+            when (stop) {
+                0 -> stopRef.setValue(1)
+                1 -> stopRef.setValue(2)
+                else -> print("Don't change.")
+            }
+        }.addOnFailureListener {
+            Log.e("Firebase", "Error getting data.", it)
+        }
+    }
 }
