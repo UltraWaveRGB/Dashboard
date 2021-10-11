@@ -96,7 +96,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun template(newPower: Int, time: Int) {
-        database.getReference("power").setValue(newPower)
+        updateSeekBarPotencia(newPower)
+        findViewById<SeekBar>(R.id.skbar_potencia).setProgress(newPower)
         // ? update da seekbar ?
         database.getReference("time").setValue(time)
         database.getReference("state").setValue(1)
