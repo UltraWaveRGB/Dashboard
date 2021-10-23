@@ -5,23 +5,21 @@ import android.util.Log
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
     private val database = Firebase.database
-    private val STATE_ON = 1
-    private val STATE_OFF = 0
-    private val STATE_PAUSED = 2
+    private var doorIsOpen = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        // teste da conexao
-        val myRef = database.getReference("message")
-        myRef.setValue("There's a maggot!")
 
         val btnPipoca = findViewById<Button>(R.id.btn_pipoca)
         val btnLasanha = findViewById<Button>(R.id.btn_lasanha)
@@ -37,11 +35,14 @@ class MainActivity : AppCompatActivity() {
 
         database.getReference("power").get().addOnSuccessListener {
             val intValue = it.value.toString().toInt()
-            seekBar.setProgress(intValue)
+            seekBar.progress = intValue
             updateSeekBarPotencia(intValue)
         }.addOnFailureListener {
             Log.e("firebase", "Error getting data.", it)
         }
+
+        addDoorIsOpenListener()
+        addTimerListener()
 
         /* --- FUNCOES DOS WIDGETS --- */
 
@@ -70,11 +71,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnStart.setOnClickListener {
-            handleState()
+            if (doorIsOpen) {
+                Toast.makeText(this, "Porta Aberta", Toast.LENGTH_LONG).show()
+            } else {
+                database.getReference("start_button_was_pressed").setValue(1)
+            }
         }
 
         btnStop.setOnClickListener {
-            handleState()
+            database.getReference("stop_button_was_pressed").setValue(1)
         }
 
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -91,33 +96,56 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateSeekBarPotencia(value: Int) {
         val txtViewPotencia = findViewById<TextView>(R.id.txtview_potencia_value)
-        txtViewPotencia.setText("${value}%")
+        txtViewPotencia.text = "${value}%"
         database.getReference("power").setValue(value)
     }
 
-    private fun template(newPower: Int, time: Int) {
+    private fun template(newPower: Int, timer: Int) {
         updateSeekBarPotencia(newPower)
-        findViewById<SeekBar>(R.id.skbar_potencia).setProgress(newPower)
-        // ? update da seekbar ?
-        database.getReference("time").setValue(time)
-        database.getReference("state").setValue(1)
+        findViewById<SeekBar>(R.id.skbar_potencia).progress = newPower
+        database.getReference("timer").setValue(timer)
+        database.getReference("start_button_was_pressed").setValue(1)
     }
 
-    private fun handleState() {
-        val stateRef = database.getReference("state")
-        stateRef.get().addOnSuccessListener {
-            val stop = it.value.toString().toInt()
-            when (stop) {
-                STATE_OFF -> stateRef.setValue(STATE_ON)
-                STATE_ON -> stateRef.setValue(STATE_PAUSED)
-                STATE_PAUSED -> stateRef.setValue(STATE_OFF)
+
+    private fun addDoorIsOpenListener() {
+        val doorListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val value = snapshot.value.toString()
+                if (value == "1") {
+                    doorIsOpen = true
+                } else if (value == "0") {
+                    doorIsOpen = false
+                }
             }
-        }.addOnFailureListener {
-            Log.e("Firebase", "Error getting data.", it)
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("Firebase", "loadPost: Cancelled", error.toException())
+            }
         }
+        database.getReference("door_is_open").addValueEventListener(doorListener)
     }
 
-    private fun setTime() {
-        TODO("Precisa implementar")
+    private fun addTimerListener() {
+        val txtViewTempo = findViewById<TextView>(R.id.txtview_tempo_value)
+        val timerListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val value = snapshot.value.toString().toInt()
+                if (value >= 60) {
+                    val minutes = value / 60
+                    val seconds = value % 60
+                    val m_string = if (minutes >= 10) "$minutes" else "0$minutes"
+                    val s_string = if (seconds >= 10) "$seconds" else "0$seconds"
+                    txtViewTempo.text = "${m_string}:${s_string}"
+                } else {
+                    txtViewTempo.text = if (value >= 10) "00:$value" else "00:0$value"
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.w("Firebase", "loadPost: Cancelled", error.toException())
+            }
+        }
+        database.getReference("timer").addValueEventListener(timerListener)
     }
 }
