@@ -37,6 +37,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
+            android:textSize="10sp"
             android:text="Brigadeiro" />
 
     </LinearLayout>
@@ -79,8 +80,6 @@
 
     </LinearLayout>
 
-    <!-- TODO: texto com valor do slide -->
-
     <RelativeLayout
         android:id="@+id/time_power_layout"
         android:layout_width="match_parent"
@@ -99,19 +98,27 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Tempo: "
+                android:text="TEMPO: "
                 android:textAlignment="center"
-                android:textSize="50sp" />
+                android:textSize="30sp" />
 
-            <!-- TODO: arrumar layout -->
             <EditText
                 android:id="@+id/txtview_tempo_value_minutes"
-                android:layout_width="5dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:inputType="number"
                 android:text="12"
+                android:textAlignment="center"
+                android:textSize="50sp" />
+
+            <TextView
+                android:id="@+id/txtview_tempo"
+                android:layout_width="5dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text=":"
                 android:textAlignment="center"
                 android:textSize="50sp" />
 
