@@ -2,10 +2,7 @@ package com.ultrawavergb.dashboard
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -74,7 +71,19 @@ class MainActivity : AppCompatActivity() {
             if (doorIsOpen) {
                 Toast.makeText(this, "Porta Aberta", Toast.LENGTH_LONG).show()
             } else {
-                database.getReference("start_button_was_pressed").setValue(1)
+                val editTextTempoMinutes = findViewById<EditText>(R.id.txtview_tempo_value_minutes)
+                val editTextTempoSeconds = findViewById<EditText>(R.id.txtview_tempo_value_seconds)
+                val minutes = editTextTempoMinutes.text.toString().toInt()
+                val seconds = editTextTempoSeconds.text.toString().toInt()
+                if (seconds > 60) {
+                    Toast.makeText(this, "Valor de tempo invalido", Toast.LENGTH_LONG).show()
+                } else {
+                    database.getReference("start_button_was_pressed").setValue(1)
+                    database.getReference("timer").setValue(minutes * 60 + seconds)
+                    editTextTempoMinutes.isEnabled = false
+                    editTextTempoSeconds.isEnabled = false
+                }
+
             }
         }
 
@@ -127,18 +136,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addTimerListener() {
-        val txtViewTempo = findViewById<TextView>(R.id.txtview_tempo_value)
+        val editTextTempoMinutes = findViewById<TextView>(R.id.txtview_tempo_value_minutes)
+        val editTextTempoSeconds = findViewById<TextView>(R.id.txtview_tempo_value_seconds)
         val timerListener = object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val value = snapshot.value.toString().toInt()
                 if (value >= 60) {
                     val minutes = value / 60
                     val seconds = value % 60
-                    val m_string = if (minutes >= 10) "$minutes" else "0$minutes"
-                    val s_string = if (seconds >= 10) "$seconds" else "0$seconds"
-                    txtViewTempo.text = "${m_string}:${s_string}"
+                    editTextTempoMinutes.text = if (minutes >= 10) "$minutes" else "0$minutes"
+                    editTextTempoSeconds.text = if (seconds >= 10) "$seconds" else "0$seconds"
                 } else {
-                    txtViewTempo.text = if (value >= 10) "00:$value" else "00:0$value"
+                    editTextTempoMinutes.text = "00"
+                    editTextTempoSeconds.text = if (value >= 10) "$value" else "0$value"
+                }
+
+                if (value == 0) {
+                    editTextTempoMinutes.isEnabled = true
+                    editTextTempoSeconds.isEnabled = true
                 }
             }
 
